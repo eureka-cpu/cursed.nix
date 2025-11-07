@@ -1,6 +1,6 @@
-{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") { }
-}:
 let
+  sources = import ./npins;
+  pkgs = import sources.nixpkgs { };
   luapkgs = with pkgs.luaPackages; [ luasocket ];
   pypkgs = pkgs.python313.withPackages (pypkgs: with pypkgs; [
     black
@@ -17,6 +17,7 @@ pkgs.mkShell {
     go
   ];
   packages = with pkgs; [
+    npins
     lua-language-server
     luaformatter
     rust-analyzer

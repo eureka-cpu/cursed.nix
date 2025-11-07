@@ -1,4 +1,4 @@
-{ lib, buildGoModule, pysend }:
+{ lib, buildGoModule }:
 let
   pname = "serve";
   version = "0.0.0";
@@ -14,13 +14,6 @@ buildGoModule {
   inherit pname version src;
   vendorHash = null;
   doCheck = false;
-  patchPhase = ''
-    runHook prePatch
-    substituteInPlace cmd/serve/main.go \
-      --replace-fail '"../pysrc/send.py"' '"${pysend}/bin/send.py"'
-    cat cmd/serve/main.go
-    runHook postPatch
-  '';
   buildPhase = ''
     runHook preBuild
     go build cmd/serve/main.go
