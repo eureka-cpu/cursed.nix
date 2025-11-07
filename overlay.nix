@@ -225,4 +225,14 @@ in
   default-aarch64 = final.pkgsCross.aarch64-multiplatform.callPackage runFunc {
     name_suffix = "aarch64";
   };
+
+  inherit
+    rustserve
+    pythonsend
+    gosend
+    luasend
+    luaserve
+    goserve
+    pythonserve
+    ;
 }
