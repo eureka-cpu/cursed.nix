@@ -14,6 +14,7 @@ python313Packages.buildPythonApplication {
   format = "other";
   patchPhase = ''
     runHook prePatch
+    patchShebangs send.py
     mkdir -p $out/bin
     chmod +x send.py
     cp send.py $out/bin

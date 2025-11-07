@@ -1,3 +1,4 @@
 /target
-/gosrc/send
-/gosrc/serve
+/gosrc/cmd/send/send
+/gosrc/cmd/serve/serve
+*result

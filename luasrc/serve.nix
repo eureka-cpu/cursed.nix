@@ -1,4 +1,4 @@
-{ lib, luaPackages }:
+{ lib, luaPackages, gosend }:
 let
   pname = "serve";
   version = "0.0.0-1";
@@ -17,6 +17,9 @@ luaPackages.buildLuaApplication {
   propagatedBuildInputs = with luaPackages; [ luasocket ];
   patchPhase = ''
     runHook prePatch
+    patchShebangs serve.lua
+    substituteInPlace serve.lua \
+      --replace-fail '"../gosrc/cmd/send/send "' '"${gosend}/bin/send.go "'
     mkdir -p $out/bin
     chmod +x serve.lua
     cp serve.lua $out/bin

@@ -1,4 +1,4 @@
-{ lib, python313Packages }:
+{ lib, python313Packages, luasend }:
 let
   pname = "serve";
   version = "0.0.0";
@@ -14,6 +14,10 @@ python313Packages.buildPythonApplication {
   format = "other";
   patchPhase = ''
     runHook prePatch
+    patchShebangs serve.py
+    substituteInPlace serve.py \
+      --replace-fail '"../luasrc/send.lua"' '"${luasend}/bin/send.lua"'
+    cat serve.py
     mkdir -p $out/bin
     chmod +x serve.py
     cp serve.py $out/bin

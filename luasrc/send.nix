@@ -17,6 +17,7 @@ luaPackages.buildLuaApplication {
   propagatedBuildInputs = with luaPackages; [ luasocket ];
   patchPhase = ''
     runHook prePatch
+    patchShebangs send.lua
     mkdir -p $out/bin
     chmod +x send.lua
     cp send.lua $out/bin
