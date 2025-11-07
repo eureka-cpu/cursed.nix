@@ -1,3 +1,4 @@
+
 ##### cursed.nix
 
 # OH NO, YOU"VE BEEN CURSED
