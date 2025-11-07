@@ -2,3 +2,4 @@
 /gosrc/cmd/send/send
 /gosrc/cmd/serve/serve
 *result
+*result-*
