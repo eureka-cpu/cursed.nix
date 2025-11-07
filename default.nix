@@ -1,1 +1,1 @@
-(import ./release.nix).curse
+(import ./release.nix { }).curse

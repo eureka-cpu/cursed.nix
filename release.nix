@@ -18,6 +18,8 @@ in
 # Reuse sources from the `flake.lock` in the root if we are not supplied them.
 { system ? currentSystem
 , nixpkgs ? fetchFromSources "nixpkgs"
+, treefmt ? import (fetchFromSources "treefmt")
+, projectRootFile ? "release.nix"
 }:
 let
   pkgs = import nixpkgs {
@@ -26,8 +28,24 @@ let
       (import ./overlay.nix)
     ];
   };
+  formattingOptions = projectRootFile: {
+    inherit projectRootFile;
+    programs = {
+      nixpkgs-fmt.enable = true;
+      gofmt.enable = true;
+      black.enable = true;
+      rustfmt.enable = true;
+      taplo.enable = true;
+    };
+  };
+  treefmtEval = treefmt.evalModule pkgs (formattingOptions projectRootFile);
+  formatter = treefmtEval.config.build.wrapper;
 in
 {
+  inherit
+    formattingOptions
+    formatter
+    ;
   inherit (pkgs)
     gosend
     goserve
@@ -61,8 +79,8 @@ in
       luaformatter
       rust-analyzer
       gopls
+      formatter
     ] ++ (with pkgs.python313Packages; [
-      black
       python-lsp-server
       python-lsp-ruff
     ]);

@@ -3,32 +3,30 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    treefmt = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, treefmt }:
     let
       defaultSystems = [ "x86_64-linux" "aarch64-linux" ];
-      eachSystem = nixpkgs.lib.genAttrs defaultSystems;
-      overlays = {
-        default = import ./overlay.nix;
-      };
-    in
-    {
-      inherit overlays;
-
-      legacyPackages = eachSystem (system:
+      eachSystem = f: nixpkgs.lib.genAttrs defaultSystems (system:
         let
           release = import ./release.nix {
             inherit system nixpkgs;
+            treefmt = treefmt.lib;
           };
         in
-        release.legacyPackages
-      );
+        f system release release.legacyPackages);
+    in
+    {
+      overlays.default = import ./overlay.nix;
 
-      packages = eachSystem (system:
-        let
-          pkgs = self.legacyPackages.${system};
-        in
+      legacyPackages = eachSystem (_: _: pkgs: pkgs);
+
+      packages = eachSystem (_: _: pkgs:
         {
           inherit (pkgs)
             gosend
@@ -46,9 +44,8 @@
             ;
         });
 
-      apps = eachSystem (system:
+      apps = eachSystem (_: _: pkgs:
         let
-          pkgs = self.packages.${system};
           type = "app";
           sendMeta = {
             meta.description = "Send chunks of data over TCP to the specified address";
@@ -89,8 +86,10 @@
           };
         });
 
-      devShells = eachSystem (system: {
-        default = import ./shell.nix { inherit system; };
+      devShells = eachSystem (system: _: _: {
+        default = import ./shell.nix { inherit system; projectRootFile = "flake.nix"; };
       });
+
+      formatter = eachSystem (_: release: pkgs: treefmt.lib.mkWrapper pkgs (release.formattingOptions "flake.nix"));
     };
 }

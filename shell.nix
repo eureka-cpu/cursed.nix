@@ -1,4 +1,6 @@
-{ system ? builtins.currentSystem }:
+{ system ? builtins.currentSystem
+, projectRootFile ? "release.nix"
+}:
 (import ./release.nix {
-  inherit system;
+  inherit system projectRootFile;
 }).devShell
