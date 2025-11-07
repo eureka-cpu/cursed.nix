@@ -90,6 +90,10 @@
         default = import ./shell.nix { inherit system; projectRootFile = "flake.nix"; };
       });
 
+      checks = eachSystem (_: release: pkgs: {
+        format = (treefmt.lib.evalModule pkgs (release.formattingOptions "flake.nix")).config.build.check ./.;
+      });
+
       formatter = eachSystem (_: release: pkgs: treefmt.lib.mkWrapper pkgs (release.formattingOptions "flake.nix"));
     };
 }

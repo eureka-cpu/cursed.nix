@@ -1,10 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"time"
-	"fmt"
 )
 
 func main() {
@@ -18,7 +18,7 @@ func main() {
 	for {
 		cmd := exec.Command("../pysrc/send.py", chunkFile)
 		if err := cmd.Run(); err != nil {
-		    fmt.Println("Error running command:", err)
+			fmt.Println("Error running command:", err)
 		}
 		time.Sleep(1 * time.Second)
 	}

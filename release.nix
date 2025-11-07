@@ -40,11 +40,15 @@ let
   };
   treefmtEval = treefmt.evalModule pkgs (formattingOptions projectRootFile);
   formatter = treefmtEval.config.build.wrapper;
+  checks = {
+    format = treefmtEval.config.build.check ./.;
+  };
 in
 {
   inherit
     formattingOptions
     formatter
+    checks
     ;
   inherit (pkgs)
     gosend
