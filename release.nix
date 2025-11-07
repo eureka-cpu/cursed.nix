@@ -8,7 +8,15 @@ let
   };
 in
 {
-  default = legacyPackages.default;
-  default-static = legacyPackages.default-static;
-  default-aarch64 = legacyPackages.default-aarch64;
+  default = legacyPackages.symlinkJoin {
+    name = "runstuff";
+    paths = [
+      legacyPackages.default
+      legacyPackages.default-static
+      legacyPackages.default-aarch64
+    ];
+    postBuild = ''
+      ls
+    '';
+  };
 }

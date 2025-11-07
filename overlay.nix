@@ -170,9 +170,9 @@ let
   };
 
   runFunc =
-    { stdenv }:
+    { stdenv, name_suffix }:
     stdenv.mkDerivation {
-      pname = "run-script";
+      pname = "run-script-${name_suffix}";
       version = "1.0.0";
 
       src = lib.fileset.toSource {
@@ -208,19 +208,21 @@ let
       buildPhase = ''
         mkdir -p $out/bin
         mkdir -p $out/data
-        cp run.sh $out/bin/run.sh
+        cp run.sh $out/bin/run${name_suffix}.sh
 
         cp gosrc/chunk3.bin $out/data/chunk3.bin
         cp luasrc/chunk1.bin $out/data/chunk1.bin
         cp pysrc/chunk2.bin $out/data/chunk2.bin
 
-        chmod +x $out/bin/run.sh
+        chmod +x $out/bin/run${name_suffix}.sh
       '';
     };
 
 in
 {
-  default = final.callPackage runFunc { };
-  default-static = final.pkgsStatic.callPackage runFunc { };
-  default-aarch64 = final.pkgsCross.aarch64-multiplatform.callPackage runFunc { };
+  default = final.callPackage runFunc { name_suffix = ""; };
+  default-static = final.pkgsStatic.callPackage runFunc { name_suffix = "static"; };
+  default-aarch64 = final.pkgsCross.aarch64-multiplatform.callPackage runFunc {
+    name_suffix = "aarch64";
+  };
 }
