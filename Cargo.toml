@@ -1,0 +1,23 @@
+[package]
+name = "curse"
+version = "0.0.0"
+description = "A webserver written by the ancients to lift the curse."
+edition = "2024"
+publish = false
+
+[[bin]]
+name = "curse"
+path = "rustsrc/main.rs"
+
+[dependencies]
+clap = { version = "4.5", features = ["derive", "env"] }
+axum = { version = "0.8", features = ["macros"] }
+tokio = { version = "1.48", features = [
+  "macros",
+  "rt-multi-thread",
+  "net",
+  "io-util",
+] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
