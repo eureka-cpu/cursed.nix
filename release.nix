@@ -1,17 +1,10 @@
 let
   sources = import ./npins;
-  pkgs = import sources.nixpkgs { };
-
-  run = pkgs.runCommand "run-script" { } ''
-    mkdir -p $out/bin
-    cp ${./run.sh} $out/bin/run.sh
-    chmod +x $out/bin/run.sh
-  '';
+  pkgs = import sources.nixpkgs {
+    system = "x86_64-linux";
+  };
 
   lib = pkgs.lib;
-in
-{
-  default = run;
 
   rustserve = pkgs.rustPlatform.buildRustPackage {
     pname = "rust-serve";
@@ -33,6 +26,12 @@ in
     version = "1.0.0";
 
     src = ./pysrc;
+
+    patchPhase = ''
+      runHook prePatch
+      patchShebangs send.py
+      runHook postPatch
+    '';
 
     buildPhase = ''
       mkdir -p $out/bin
@@ -66,7 +65,16 @@ in
 
     propagatedBuildInputs = [ pkgs.luaPackages.luasocket ];
 
+    patchPhase = ''
+      runHook prePatch
+
+      patchShebangs send.lua
+
+      runHook postPatch
+    '';
+
     installPhase = ''
+      runHook preInstall
       mkdir -p $out/bin
       cp send.lua $out/bin/send.lua
 
@@ -79,6 +87,7 @@ in
       EOF
 
       chmod +x $out/bin/send
+      runHook postInstall
     '';
   };
 
@@ -95,7 +104,15 @@ in
 
     propagatedBuildInputs = [ pkgs.luaPackages.luasocket ];
 
+    patchPhase = ''
+      runHook prePatch
+      substituteInPlace serve.lua --replace-fail "../gosrc/send " "${gosend}/bin/sendserver "
+      patchShebangs serve.lua
+      runHook postPatch
+    '';
+
     installPhase = ''
+      runHook preInstall
       mkdir -p $out/bin
       cp serve.lua $out/bin/serve.lua
 
@@ -108,6 +125,7 @@ in
       EOF
 
       chmod +x $out/bin/serve
+      runHook postInstall
     '';
   };
 
@@ -121,6 +139,89 @@ in
         ./gosrc/serve.go
       ];
     };
+
+    patchPhase = ''
+      runHook prePatch
+      substituteInPlace serve.go --replace-fail "../pysrc/send.py" "${pythonsend}/bin/send.py"
+      runHook postPatch
+    '';
     vendorHash = null;
   };
+
+  pythonserve = pkgs.stdenv.mkDerivation {
+    pname = "python-serve";
+    version = "1.0.0";
+
+    src = ./pysrc;
+
+    patchPhase = ''
+      runHook prePatch
+      substituteInPlace serve.py --replace-fail "../luasrc/send.lua" "${luasend}/bin/send"
+      patchShebangs serve.py
+      runHook postPatch
+    '';
+
+    buildPhase = ''
+      mkdir -p $out/bin
+      cp serve.py $out/bin/serve.py
+    '';
+  };
+
+  runFunc =
+    { stdenv }:
+    stdenv.mkDerivation {
+      pname = "run-script";
+      version = "1.0.0";
+
+      src = lib.fileset.toSource {
+        root = ./.;
+        fileset = lib.fileset.unions [
+          ./run.sh
+          ./gosrc/chunk3.bin
+          ./luasrc/chunk1.bin
+          ./pysrc/chunk2.bin
+        ];
+      };
+
+      patchPhase = ''
+        runHook prePatch
+        substituteInPlace run.sh \
+          --replace-fail "cd ./gosrc" "" \
+          --replace-fail "cd ./luasrc" "" \
+          --replace-fail "cd ./pysrc" "" \
+          --replace-fail "./target/debug/curse &" "${rustserve}/bin/curse &" \
+          --replace-fail "./serve \"chunk3.bin\"" "${goserve}/bin/sendserver $out/data/chunk3.bin" \
+          --replace-fail "./serve.lua \"chunk1.bin\"" "${luaserve}/bin/serve $out/data/chunk1.bin" \
+          --replace-fail "./serve.py \"chunk2.bin\"" "${pythonserve}/bin/serve.py $out/data/chunk2.bin"
+        runHook postPatch
+      '';
+
+      buildPhase = ''
+        mkdir -p $out/bin
+        mkdir -p $out/data
+        cp run.sh $out/bin/run.sh
+
+        cp gosrc/chunk3.bin $out/data/chunk3.bin
+        cp luasrc/chunk1.bin $out/data/chunk1.bin
+        cp pysrc/chunk2.bin $out/data/chunk2.bin
+
+        chmod +x $out/bin/run.sh
+      '';
+    };
+
+in
+{
+  default = pkgs.callPackage runFunc { };
+  default-static = pkgs.pkgsStatic.callPackage runFunc { };
+  default-aarch64 = pkgs.pkgsCross.aarch64-multiplatform.callPackage runFunc { };
+
+  inherit
+    rustserve
+    pythonsend
+    gosend
+    luasend
+    luaserve
+    goserve
+    pythonserve
+    ;
 }

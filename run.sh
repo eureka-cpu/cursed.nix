@@ -28,19 +28,16 @@ rust_pid=$!
 
 sleep 2
 
-# send from python
 cd ./gosrc
 ./serve "chunk3.bin" &
 go_pid=$!
 cd ..
 
-# send from go
 cd ./luasrc
 ./serve.lua "chunk1.bin" &
 lua_pid=$!
 cd ..
 
-# send from lua
 cd ./pysrc
 ./serve.py "chunk2.bin" &
 py_pid=$!
