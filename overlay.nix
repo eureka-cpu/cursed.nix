@@ -1,9 +1,9 @@
 final: prev: {
 
-  exorcism = final.callPackage
+  exorcise = final.callPackage
     ({ stdenv, lib, curse, serve-go, serve-lua, serve-py }:
       stdenv.mkDerivation {
-        pname = "exorcism";
+        pname = "exorcise";
         version = "13.13.13";
 
         src = lib.fileset.toSource {

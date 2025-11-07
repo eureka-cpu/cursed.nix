@@ -1,1 +1,1 @@
-(import ./release.nix).cursed
+(import ./release.nix).exorcise
