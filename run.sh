@@ -4,8 +4,8 @@ set -euo pipefail
 # Tries to lift the curse for some arbitrary number of seconds
 
 export HOST="127.0.0.1"
-export RECV_PORT="6000"
-export SERVE_PORT="4000"
+export RECV_PORT="5000"
+export SERVE_PORT="5001"
 
 ./target/debug/curse &
 rust_pid=$!
