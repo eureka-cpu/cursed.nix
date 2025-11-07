@@ -16,8 +16,8 @@
     packages = eachSupportedSystem (system: let
         pkgs = import nixpkgs { inherit system; overlays = [overlay]; };
       in {
-        inherit (pkgs) exorcism curse send-go serve-go send-py serve-py send-lua serve-lua;
-        default = pkgs.exorcism;
+        inherit (pkgs) exorcise curse send-go serve-go send-py serve-py send-lua serve-lua;
+        default = pkgs.exorcise;
     });
 
     apps = eachSupportedSystem (system: let
@@ -25,7 +25,7 @@
       in {
         exorcise = {
           type = "app";
-          program = "${pkgs.exorcism}/bin/exorcise.sh";
+          program = "${pkgs.exorcise}/bin/exorcise.sh";
         };
     });
   };
