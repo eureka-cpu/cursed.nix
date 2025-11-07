@@ -13,7 +13,7 @@ rust_pid=$!
 sleep 2
 
 cd ./gosrc
-./serve "chunk3.bin" &
+./cmd/serve/serve "chunk3.bin" &
 go_pid=$!
 cd ..
 

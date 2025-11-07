@@ -10,6 +10,6 @@ end
 local chunk_file = arg[1]
 
 while true do
-  os.execute("../gosrc/send " .. chunk_file)
+  os.execute("../gosrc/cmd/send/send " .. chunk_file)
   socket.sleep(1)
 end
