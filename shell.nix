@@ -16,14 +16,8 @@ pkgs.mkShell {
     pkgs.go
     pkgs.lua
     pkgs.luaPackages.luasocket
+    pkgs.python313
   ];
 
   RUSTFLAGS = "--cfg procmacro2_semver_exempt -Z allow-features=edition2024";
-  #   pkgs.hello
-  #   pkgs.jq
-  # ];
-
-  # inputsFrom = [ ];
-  # FOOBAR = 123;
-  # shellHooks = ''echo "Hello"'';
 }
